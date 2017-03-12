@@ -1,5 +1,21 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-  
+import re
+import json
+
+#默认读取当前目录下的mycookies.json文件,发挥cookies的list，供后续请求头部附加
+def get_cookies():
+	with open('./mycookies.json') as f:
+		cookies_count = []
+		data = f.read()
+		res = re.findall('{.+?}',data)
+		for i in res:
+			cookies_count.append(json.loads(i))
+		f.close()
+	return cookies_count
+
+ALL_COOKIES = get_cookies()
+
 
 USER_AGENTS = [
 		"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; AcooBrowser; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
