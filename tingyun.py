@@ -7,6 +7,7 @@ import subprocess
 import commands
 import random
 import json
+from bs4 import BeautifulSoup
 import requests
 from headers import USER_AGENTS,ALL_COOKIES
 import MySQLdb
@@ -26,7 +27,7 @@ def get_info(keywork):
 def Request(url):
 	header = random.choice(USER_AGENTS)
 	cookie = random.choice(ALL_COOKIES)
-	res = requests.get(url,headers={"USER_AGENT":header}).content
+	res = requests.get(url,headers={"USER_AGENT":header},cookies=cookie).content
 	return res
 
 	"""
@@ -46,7 +47,7 @@ def get_big_v(keyword,n):
 	res_list = []
 	for key in keyword:
 			url = weibo_search.format(key=key)
-			map(lambda x:res_list.append(x) if (int(x['count']) > n) else "", Request(url)['data'])
+			map(lambda x:res_list.append(x) if (int(x['count']) > n) else "", (requests.get(url).json())['data'])
 	return res_list
 #使用上面的得到的关键词（dict数据），拿到满足条件的key即可.
 #我们这里拿到的结果是dict型的，如下：
@@ -58,21 +59,19 @@ def get_big_v(keyword,n):
 #	}
 def get_fans_type(keylist):
 	bigv_name = "http://weibo.com/{name}?refer_flag=1001030101_&is_all=1"
+	ten_content = []
 	for key in keylist:
-		res = Request(url)
-	
-
-
+		res = Request(bigv_name.format(name=key))
+		soup = BeautifulSoup(res)
+		ten_content.append(soup.select('.WB_text W_f14 ')[0].get_text())
+	return ten_content
 
 
 if __name__ == '__main__':
-	artist_name = ["xuezhiqian","jinsha","baijingting"]
+	artist_name = ["jinsha"]#["xuezhiqian","jinsha"]
 	#res = get_big_v(artist_name , 1000000)
-	print Request("http://s.weibo.com/ajax/suggestion?where=gs_weibo&type=gs_weibo&key=jinsha")
-
+	print get_fans_type(artist_name)
 	
-		
-
 
 		
 		
